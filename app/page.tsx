@@ -260,6 +260,7 @@ export default function PortfolioPage() {
       const loadedData = {
         services: (servicesData && servicesData.length > 0) ? servicesData.map((s: any) => ({
           ...s,
+          images: s.images || [],
           desc: s.description, // mapping description to desc to match interface
           createdAt: s.created_at
         })) : DEFAULT_SERVICES,
@@ -574,6 +575,24 @@ export default function PortfolioPage() {
       `Agende sua consulta na *${ESCRITORIO_NOME}*!\n` +
       `📞 ${WHATSAPP_NUMBER_FORMAT}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleDownloadCatalog = () => {
+    const header = "CÓDIGO,CATEGORIA,SERVIÇO,PREÇO,DESCRIÇÃO\n";
+    const rows = services.map(s => 
+      `"${s.code || 'SERV'}","${s.category}","${s.name}","${s.price}","${s.desc.replace(/"/g, '""')}"`
+    ).join("\n");
+    
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `catalogo_oliveira_mendes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Sucesso', 'O catálogo foi baixado com sucesso!');
   };
 
   const handleConfirmSchedule = async () => {
@@ -953,6 +972,37 @@ export default function PortfolioPage() {
             </div>
           )}
         </main>
+
+        <footer className="bg-zinc-950 border-t border-zinc-800 py-12 pb-32">
+          <div className="container mx-auto px-4 text-center">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+                <i className="fas fa-balance-scale text-white text-xl"></i>
+              </div>
+              <div className="text-left">
+                <h2 className="text-xl font-serif font-black italic tracking-tighter text-white">Oliveira <span className="text-secondary">Mendes</span></h2>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Advocacia & Consultoria</p>
+              </div>
+            </div>
+            <p className="text-zinc-500 text-sm mb-8 max-w-md mx-auto">Excelência jurídica em cada detalhe. Atendimento personalizado e soluções estratégicas para seus desafios legais.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+              <button onClick={handleDownloadCatalog} className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white px-8 py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2 transition-all border border-zinc-700 shadow-lg">
+                <i className="fas fa-file-download text-secondary"></i> Download do Catálogo
+              </button>
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-8 py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2 transition-all border border-zinc-800">
+                <i className="fas fa-arrow-up"></i> Voltar ao Topo
+              </button>
+            </div>
+            <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-zinc-600 text-[10px] uppercase font-bold tracking-widest">&copy; 2024 Oliveira Mendes Advocacia. Todos os direitos reservados.</p>
+              <div className="flex gap-6">
+                <a href="#" className="text-zinc-600 hover:text-secondary transition-colors"><i className="fab fa-instagram text-lg"></i></a>
+                <a href="#" className="text-zinc-600 hover:text-secondary transition-colors"><i className="fab fa-linkedin text-lg"></i></a>
+                <a href="#" className="text-zinc-600 hover:text-secondary transition-colors"><i className="fab fa-facebook text-lg"></i></a>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* WhatsApp Float */}
